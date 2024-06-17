@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: rabbitmq
+  name: rabbitmq
+  namespace: default
+spec:
+  serviceName: default
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbitmq
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+    spec:
+      containers:
+      - image: rabbitmq:3-management
+        name: rabbitmq
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "500m"
+          limits:
+            memory: "256Mi"
+            cpu: "1000m"
+        ports:
+        - containerPort: 5672
+        - containerPort: 15672
+        volumeMounts:
+        - name: rabbitmq-data
+          mountPath: /data/rabbitmq
+      volumes:
+      - name: rabbitmq-data
+        persistentVolumeClaim:
+          claimName: rabbitmq-pvc
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: rabbitmq-pv
+  namespace: default
+  labels:
+    type: local
+spec:
+  storageClassName: local-path
+  capacity:
+    storage: 5Gi
+  accessModes:
+  - ReadWriteOnce
+  hostPath:
+    path: /data/rabbitmq
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rabbitmq-pvc
+  namespace: default
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: rabbitmq
+  name: rabbitmq-svc
+  namespace: default
+spec:
+  type: NodePort
+  ports:
+  - port: 5672
+    name: rabbitmq-console
+    protocol: TCP
+    targetPort: 5672
+  - port: 15672
+    name: rabbitmq-server
+    protocol: TCP
+    targetPort: 15672
+  selector:
+    app: rabbitmq
+status:
+  loadBalancer: {}

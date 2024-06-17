@@ -1,0 +1,25 @@
+name: "CI/CD - Deploy"
+on:
+    workflow_dispatch:
+jobs:
+    terraform-deploy-app:      
+      name: Terraform Deploy App
+      runs-on: ubuntu-latest
+    
+      steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+  
+      - name: "Configure AWS Credentials"
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: us-east-1
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}                
+      - name: Deploy no AWS
+        working-directory: ./src_app
+        run: |
+          aws eks update-kubeconfig --name ada-aws-eks --region us-east-1
+          kubectl apply -f .
+          kubectl get node
+          kubectl get pods -A

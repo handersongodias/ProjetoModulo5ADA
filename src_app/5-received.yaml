@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: received-app
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: received-app
+  template:
+    metadata:
+      labels:
+        app: received-app
+    spec:
+      containers:
+      - name: received-container
+        image: 'repository-docker-hub:tag'
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "500m"
+          limits:
+            memory: "256Mi"
+            cpu: "1000m"
+        ports:
+        - containerPort: 80

@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: redis
+  name: redis
+  namespace: default
+spec:
+  serviceName: default
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+      - image: redis/redis-stack
+        name: redis
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "500m"
+          limits:
+            memory: "256Mi"
+            cpu: "1000m"
+        ports:
+        - containerPort: 6379
+        - containerPort: 8001
+        volumeMounts:
+        - name: redis-data
+          mountPath: /data/redis
+      volumes:
+      - name: redis-data
+        persistentVolumeClaim:
+          claimName: redis-pvc
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: redis-pv
+  namespace: default
+  labels:
+    type: local
+spec:
+  storageClassName: local-path
+  capacity:
+    storage: 5Gi
+  accessModes:
+  - ReadWriteOnce
+  hostPath:
+    path: /data/redis
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-pvc
+  namespace: default
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: redis
+  name: redis-svc
+  namespace: default
+spec:
+  type: NodePort
+  ports:
+  - port: 6379
+    name: redis-console
+    protocol: TCP
+    targetPort: 6379
+  - port: 8001
+    name: redis-http
+    protocol: TCP
+    targetPort: 8001
+  selector:
+    app: redis
+status:
+  loadBalancer: {}

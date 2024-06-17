@@ -1,0 +1,35 @@
+name: "Get Logs by Pods-AWS"
+on:
+    workflow_dispatch:
+          inputs:
+            podName1:
+              description: "Nome do pod"
+              required: true
+              type: string
+              default: "--tail=100 received-app-"
+            podName2:
+              description: "Nome do pod"
+              required: true
+              type: string
+              default: "--tail=100 send-app-"    
+env:
+    TF_VAR_aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    TF_VAR_aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}   
+jobs:
+    terraform-aws-logs:
+        name: Get Logs Pods
+        runs-on: ubuntu-latest       
+        steps:          
+            - name: "Configure AWS Credentials"
+              uses: aws-actions/configure-aws-credentials@v4
+              with:
+                aws-region: us-east-1
+                aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}        
+            - name: Get Logs
+              run: |
+                aws eks update-kubeconfig --name ada-aws-eks --region us-east-1
+                kubectl get node
+                kubectl get pods -A
+                kubectl logs ${{ inputs.podName1 }}
+                kubectl logs ${{ inputs.podName2 }}

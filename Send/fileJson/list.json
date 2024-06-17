@@ -1,0 +1,79 @@
+[
+  {
+    "id": "1",
+    "codigoTransacao": "100",
+    "nome": "Eaton Mcdowell",
+    "valorCompra": 500,
+    "registro": "2019-07-07T12:51:21 +03:00",
+    "valorMaiorCompra": 0
+  },
+  {
+    "id": "1",
+    "codigoTransacao": "200",
+    "nome": "Eaton Mcdowell",
+    "valorCompra": 700,
+    "registro": "2019-07-07T12:51:21 +03:00",
+    "valorMaiorCompra": 0
+  },  {
+    "id": "1",
+    "codigoTransacao": "250",
+    "nome": "Eaton Mcdowell",
+    "valorCompra": 3000,
+    "registro": "2019-07-07T12:51:21 +03:00",
+    "valorMaiorCompra": 0
+  },
+  {
+    "id": "1",
+    "codigoTransacao": "300",
+    "nome": "Eaton Mcdowell",
+    "valorCompra": 4000,
+    "registro": "2019-07-07T12:51:21 +03:00",
+    "valorMaiorCompra": 0
+  },
+  {
+    "id": "1",
+    "codigoTransacao": "400",
+    "nome": "Eaton Mcdowell",
+    "valorCompra": 1000,
+    "registro": "2019-07-07T12:51:21 +03:00",
+    "valorMaiorCompra": 0
+  },
+  {
+    "id": "1",
+    "codigoTransacao": "500",
+    "nome": "Eaton Mcdowell",
+    "valorCompra": 1000,
+    "registro": "2019-07-07T12:51:21 +03:00",
+    "valorMaiorCompra": 0
+  },
+  {
+    "id": "2",
+    "codigoTransacao": "600",
+    "nome": "Glover Walter",
+    "valorCompra": 1000,
+    "registro": "2019-04-28T01:22:35 +03:00",
+    "valorMaiorCompra": 0
+  }, {
+    "id": "2",
+    "codigoTransacao": "1200",
+    "nome": "Glover Walter",
+    "valorCompra": 13682,
+    "registro": "2019-04-28T01:22:35 +03:00",
+    "valorMaiorCompra": 0
+  },
+  {
+    "id": "3",
+    "codigoTransacao": "700",
+    "nome": "Fowler Tillman",
+    "valorCompra": 5000,
+    "registro": "2016-08-14T04:35:47 +03:00",
+    "valorMaiorCompra": 0
+  },{
+    "id": "3",
+    "codigoTransacao": "715",
+    "nome": "Fowler Tillman",
+    "valorCompra": 26481,
+    "registro": "2016-08-14T04:35:47 +03:00",
+    "valorMaiorCompra": 0
+  }
+]

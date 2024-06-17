@@ -1,0 +1,66 @@
+name: "Terraform IaC-CI-CD-AWS full"
+on:
+    push:
+        branches:
+            - main
+        paths:
+            - "src_terraform/**" #so dispara se for alterado codigo
+    workflow_dispatch:
+env:
+    TF_VAR_aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    TF_VAR_aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    TF_VAR_bucket_name: ${{ secrets.AWS_BUCKET_NAME }}
+
+jobs:
+    terraform-aws-ci:
+        name: "Doing IAC on AWS EKS"
+        runs-on: ubuntu-latest
+        steps:          
+            - name: "Configure AWS Credentials"
+              uses: aws-actions/configure-aws-credentials@v4
+              with:
+                aws-region: us-east-1
+                aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}                
+
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Terraform Init
+              working-directory: ./src_terraform
+              run: terraform init -backend-config="key=${{ secrets.AWS_BUCKET_KEY}}" -backend-config="bucket=${{ secrets.AWS_BUCKET_NAME }}"
+
+            - name: Terraform Format
+              working-directory: ./src_terraform
+              run: terraform fmt
+            
+            - name: Terraform Validate
+              working-directory: ./src_terraform
+              run: terraform validate
+
+            - name: Terraform Apply
+              working-directory: ./src_terraform              
+              run: terraform apply -auto-approve
+
+    terraform-deploy:      
+            needs: [terraform-aws-ci]
+            name: Deploy APP
+            runs-on: ubuntu-latest
+            
+            steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: "Configure AWS Credentials"
+              uses: aws-actions/configure-aws-credentials@v4
+              with:
+                aws-region: us-east-1
+                aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}                
+            - name: Deploy no AWS
+              working-directory: ./src_app
+              run: |
+                aws eks update-kubeconfig --name ada-aws-eks --region us-east-1
+                kubectl apply -f .
+                kubectl get node
+                kubectl get pods -A

@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: send-app
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: send-app
+  template:
+    metadata:
+      labels:
+        app: send-app
+    spec:
+      containers:
+      - name: send-container
+        image: 'repository-docker-hub:tag'
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "500m"
+          limits:
+            memory: "256Mi"
+            cpu: "1000m"
+        ports:
+        - containerPort: 80
+

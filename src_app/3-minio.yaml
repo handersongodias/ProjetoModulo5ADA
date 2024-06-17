@@ -1,0 +1,107 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: minio
+  name: minio
+  namespace: default
+spec:
+  serviceName: default
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minio
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      containers:
+      - image: quay.io/minio/minio:latest
+        name: minio
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "500m"
+          limits:
+            memory: "256Mi"
+            cpu: "1000m"
+        env:
+        - name: MINIO_ROOT_USER
+          valueFrom:
+            configMapKeyRef:
+              name: config-server
+              key: MINIO_ROOT_USER
+        - name: MINIO_ROOT_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              name: config-server
+              key: MINIO_ROOT_PASSWORD
+        command:
+        - /bin/bash
+        - -c
+        args:
+        - minio server /data/minio --console-address :9001
+        ports:
+        - containerPort: 9001
+        - containerPort: 9000
+        volumeMounts:
+        - name: dataminio
+          mountPath: /data/minio
+      volumes:
+      - name: dataminio
+        persistentVolumeClaim:
+          claimName: minio-pvc
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: minio-pv
+  namespace: default
+  labels:
+    type: local
+spec:
+  storageClassName: local-path
+  capacity:
+    storage: 5Gi
+  accessModes:
+  - ReadWriteOnce
+  hostPath:
+    path: /data/minio
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: minio-pvc
+  namespace: default
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: minio
+  name: minio-svc
+  namespace: default
+spec:
+  type: NodePort
+  ports:
+  - port: 9001
+    name: minio-server
+    protocol: TCP
+    targetPort: 9001
+  - port: 9000
+    name: minio-console
+    protocol: TCP
+    targetPort: 9000
+  selector:
+    app: minio
+status:
+  loadBalancer: {}
